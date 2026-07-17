@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clube Sr. Du</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TELA INICIAL -->
+<div id="telaInicial" class="telaComFundo">
+
+    <div class="fundoFoto"></div>
+
+    <div class="tela telaSobreFundo">
+
+        <img src="logo.png" class="logo" alt="Sr. Du">
+        <h1>Clube Sr. Du</h1>
+        <p class="subtitulo">Digite seu WhatsApp para entrar</p>
+
+        <input type="tel" id="loginTelefone" placeholder="Seu WhatsApp">
+
+        <button id="btnEntrarCliente" class="botao">Entrar</button>
+
+        <button id="btnAbrirAdmin" class="linkAdmin">Sou administrador</button>
+
+    </div>
+
+</div>
+
+<!-- TELA CADASTRO -->
+<div id="telaCadastro" class="tela" style="display:none;">
+
+    <h1>Complete seu cadastro</h1>
+    <p class="subtitulo">É rapidinho, só essa vez!</p>
+
+    <input type="text" id="cadNome" placeholder="Seu nome">
+    <input type="date" id="cadNascimento" placeholder="Data de nascimento">
+
+    <button id="btnConcluirCadastro" class="botao">Concluir cadastro</button>
+    <button id="btnVoltarCadastro" class="botaoSecundario">Voltar</button>
+
+</div>
+
+<!-- PAINEL CLIENTE -->
+<div id="painelCliente" class="tela" style="display:none;">
+
+    <h1 id="painelSaudacao"></h1>
+
+    <div class="cardBox">
+        <p class="tituloCard">🏅 Seus selos</p>
+        <div class="progressoBarra"><div class="progressoPreenchido" id="painelProgresso"></div></div>
+        <p id="painelSelosTexto" class="textoAuxiliar"></p>
+    </div>
+
+    <div id="bannerMarco" class="cardBox bannerMarco" style="display:none;">
+        <p id="marcoTexto" class="tituloCard"></p>
+        <button id="btnResgatarMarco" class="botao">🎁 Resgatar prêmio</button>
+    </div>
+
+    <div class="cardBox">
+        <p class="tituloCard">🧾 Confirmar compra</p>
+        <p class="textoAuxiliar">Recebeu um código no caixa? Digite abaixo:</p>
+        <input type="text" id="inputCodigoCompra" placeholder="Código do caixa">
+        <button id="btnConfirmarCompra" class="botao">Confirmar compra</button>
+    </div>
+
+    <div class="cardBox cardPremioDia">
+        <p class="tituloCard">🎰 Prêmio do dia</p>
+        <div id="roleta" class="roleta">🎁</div>
+        <button id="btnGirar" class="botao">Girar</button>
+        <p id="premioDiaTexto" class="premioDiaTexto" style="display:none;"></p>
+    </div>
+
+    <div class="cardBox cardLinks">
+        <a id="linkGoogle" href="#" target="_blank" class="botaoSecundario">⭐ Avaliar no Google</a>
+        <a id="linkInstagram" href="#" target="_blank" class="botaoSecundario">📷 Seguir no Instagram</a>
+    </div>
+
+    <button id="btnSairCliente" class="botaoSair">Sair</button>
+
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="telaAdminLogin" class="tela" style="display:none;">
+
+    <h1>Área do Administrador</h1>
+
+    <input type="password" id="adminSenha" placeholder="Senha">
+
+    <button id="btnEntrarAdmin" class="botao">Entrar</button>
+    <button id="btnVoltarAdminLogin" class="botaoSecundario">Voltar</button>
+
+</div>
+
+<!-- ADMIN CENTRAL -->
+<div id="centralAdmin" class="tela" style="display:none;">
+
+    <h1>Painel Administrativo</h1>
+
+    <button id="btnCodigos" class="botao">🎟️ Gerar código de compra</button>
+    <button id="btnClientes" class="botao">👥 Clientes</button>
+    <button id="btnPremios" class="botao">🎁 Configurar prêmios e links</button>
+
+    <button id="btnSairAdmin" class="botaoSair">Sair</button>
+
+</div>
+
+<!-- GERAR CODIGO -->
+<div id="modalCodigos" class="modal" style="display:none;">
+
+    <div class="modalConteudo">
+
+        <h2>🎟️ Novo código de compra</h2>
+        <p class="textoAuxiliar">Cada código confirma 1 compra acima de R$50 (soma 1 selo e libera o prêmio do dia).</p>
+
+        <button id="btnGerarCodigo" class="botao">Gerar código</button>
+
+        <div id="codigoGeradoBox" class="codigoGeradoBox" style="display:none;">
+            <p>Código gerado:</p>
+            <div id="codigoGerado" class="codigoGerado"></div>
+        </div>
+
+        <button id="btnFecharCodigos" class="botaoSecundario">Voltar</button>
+
+    </div>
+
+</div>
+
+<!-- CLIENTES -->
+<div id="modalClientes" class="modal" style="display:none;">
+
+    <div class="modalConteudo">
+
+        <h2>👥 Clientes</h2>
+
+        <input type="text" id="buscaCliente" placeholder="Buscar por nome ou WhatsApp">
+
+        <div id="listaClientes" class="listaClientes"><p>Carregando...</p></div>
+
+        <button id="btnFecharClientes" class="botaoSecundario">Voltar</button>
+
+    </div>
+
+</div>
+
+<!-- PREMIOS / CONFIG -->
+<div id="modalPremios" class="modal" style="display:none;">
+
+    <div class="modalConteudo modalPremiosConteudo">
+
+        <h2>🎁 Configurar prêmios</h2>
+
+        <p class="tituloCard">Prêmios do sorteio diário (6 opções)</p>
+        <input type="text" id="premioDiario1" placeholder="Prêmio 1 (ex: 5% de desconto)">
+        <input type="text" id="premioDiario2" placeholder="Prêmio 2 (ex: 10% de desconto)">
+        <input type="text" id="premioDiario3" placeholder="Prêmio 3 (ex: 1 Brigadeiro)">
+        <input type="text" id="premioDiario4" placeholder="Prêmio 4 (ex: 1 Brownie)">
+        <input type="text" id="premioDiario5" placeholder="Prêmio 5 (ex: 1 Coxinha)">
+        <input type="text" id="premioDiario6" placeholder="Prêmio 6 (ex: 1 Bombom de morango)">
+
+        <p class="tituloCard">Prêmios por selos acumulados</p>
+        <input type="text" id="premio10" placeholder="Prêmio ao completar 10 selos">
+        <input type="text" id="premio20" placeholder="Prêmio ao completar 20 selos">
+        <input type="text" id="premio30" placeholder="Prêmio ao completar 30 selos">
+        <input type="text" id="premio40" placeholder="Prêmio ao completar 40 selos">
+        <input type="text" id="premio50" placeholder="Prêmio especial ao completar 50 selos">
+
+        <p class="tituloCard">Links</p>
+        <input type="text" id="linkGoogleInput" placeholder="Link da avaliação Google">
+        <input type="text" id="linkInstagramInput" placeholder="Link do Instagram">
+
+        <button id="btnSalvarPremios" class="botao">Salvar</button>
+        <button id="btnFecharPremios" class="botaoSecundario">Voltar</button>
+
+    </div>
+
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
