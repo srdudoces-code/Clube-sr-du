@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardápio - Sr. Du Doces</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="cardapio.css">
+</head>
+<body>
+
+<!-- CABEÇALHO -->
+<div id="cabecalho" class="cabecalhoCardapio">
+
+    <img src="logo.png" class="logoCardapio" alt="Sr. Du">
+
+    <div class="infoLoja">
+        <h1>Sr. Du Doces</h1>
+        <p class="subtitulo">É mais que doce. É Sr. Du Doces.</p>
+        <a id="linkEnderecoLoja" href="#" target="_blank" class="linkEndereco" style="display:none;">📍 <span id="textoEnderecoLoja"></span></a>
+    </div>
+
+    <button id="btnAcompanharPedido" class="btnAdminIcone" title="Acompanhar pedido">📦</button>
+    <button id="btnAbrirAdminCardapio" class="btnAdminIcone" title="Administrador">⚙️</button>
+
+</div>
+
+<!-- DESTAQUE DA SEMANA -->
+<div id="destaqueSemana" class="destaqueSemana" style="display:none;"></div>
+
+<!-- CATEGORIAS -->
+<div id="barraCategorias" class="barraCategorias"></div>
+
+<!-- LISTA DE PRODUTOS -->
+<div id="listaProdutos" class="listaProdutos">
+    <p class="carregandoTexto">Carregando cardápio...</p>
+</div>
+
+<!-- BARRA FLUTUANTE DO CARRINHO -->
+<div id="barraCarrinho" class="barraCarrinho" style="display:none;">
+    <span id="carrinhoResumoTexto"></span>
+    <button id="btnVerCarrinho" class="botaoCarrinho">Ver carrinho</button>
+</div>
+
+<!-- MODAL ACOMPANHAR PEDIDO -->
+<div id="modalAcompanharPedido" class="modal" style="display:none;">
+    <div class="modalConteudo">
+
+        <h2>📦 Acompanhar pedido</h2>
+
+        <input type="tel" id="acompanharTelefone" placeholder="Seu WhatsApp">
+        <button id="btnBuscarPedido" class="botao">Buscar meu pedido</button>
+
+        <div id="statusPedidoBox" class="statusPedidoBox" style="display:none;">
+
+            <div class="trilhaStatus">
+                <div class="etapaStatus" data-etapa="novo"><span class="bolinhaStatus"></span><p>Recebido</p></div>
+                <div class="etapaStatus" data-etapa="preparando"><span class="bolinhaStatus"></span><p>Em preparo</p></div>
+                <div class="etapaStatus" data-etapa="saiu_para_entrega"><span class="bolinhaStatus"></span><p>A caminho</p></div>
+                <div class="etapaStatus" data-etapa="concluido"><span class="bolinhaStatus"></span><p>Concluído</p></div>
+            </div>
+
+            <p id="statusPedidoTexto" class="textoAuxiliar"></p>
+
+            <a id="linkAvaliarAposPedido" href="#" target="_blank" class="botao" style="display:none;">⭐ Avaliar no Google</a>
+
+        </div>
+
+        <button id="btnFecharAcompanharPedido" class="botaoSecundario">Fechar</button>
+
+    </div>
+</div>
+
+<!-- MODAL CARRINHO -->
+<div id="modalCarrinho" class="modal" style="display:none;">
+    <div class="modalConteudo">
+
+        <h2>🛒 Seu carrinho</h2>
+
+        <div id="itensCarrinho" class="itensCarrinho"></div>
+
+        <div class="linhaResumo">
+            <span>Subtotal</span>
+            <span id="subtotalCarrinho">R$ 0,00</span>
+        </div>
+
+        <button id="btnIrParaEntrega" class="botao">Continuar</button>
+        <button id="btnFecharCarrinho" class="botaoSecundario">Voltar ao cardápio</button>
+
+    </div>
+</div>
+
+<!-- MODAL CHECKOUT -->
+<div id="modalCheckout" class="modal" style="display:none;">
+    <div class="modalConteudo modalCheckoutConteudo">
+
+        <h2>📦 Finalizar pedido</h2>
+
+        <p class="tituloCard">Seus dados</p>
+        <input type="text" id="checkoutNome" placeholder="Seu nome">
+        <input type="tel" id="checkoutTelefone" placeholder="Seu WhatsApp">
+
+        <p class="tituloCard">Como você quer receber?</p>
+        <div class="opcoesPagamento">
+            <label class="opcaoPagamento">
+                <input type="radio" name="tipoPedido" value="entrega" checked>
+                🛵 Entrega
+            </label>
+            <label class="opcaoPagamento">
+                <input type="radio" name="tipoPedido" value="retirada">
+                🏪 Retirar na loja
+            </label>
+            <label class="opcaoPagamento">
+                <input type="radio" name="tipoPedido" value="local">
+                🍽️ Consumir no local
+            </label>
+        </div>
+
+        <div id="blocoEndereco">
+            <p class="tituloCard">Endereço de entrega</p>
+            <select id="checkoutBairro">
+                <option value="">Selecione seu bairro</option>
+            </select>
+            <input type="text" id="checkoutRua" placeholder="Rua/Avenida e número">
+            <input type="text" id="checkoutComplemento" placeholder="Complemento (opcional)">
+            <input type="text" id="checkoutReferencia" placeholder="Ponto de referência (opcional)">
+        </div>
+
+        <p class="tituloCard">Forma de pagamento</p>
+
+        <div class="opcoesPagamento">
+            <label class="opcaoPagamento">
+                <input type="radio" name="formaPagamento" value="cartao">
+                💳 Cartão (débito/crédito na entrega)
+            </label>
+            <label class="opcaoPagamento">
+                <input type="radio" name="formaPagamento" value="pix">
+                🔑 Pix
+            </label>
+            <label class="opcaoPagamento">
+                <input type="radio" name="formaPagamento" value="dinheiro">
+                💵 Dinheiro
+            </label>
+        </div>
+
+        <div id="blocoPix" class="blocoCondicional" style="display:none;">
+            <p class="textoAuxiliar">Pague com a chave Pix abaixo e leve o comprovante:</p>
+            <div class="chavePixBox" id="chavePixTexto">—</div>
+        </div>
+
+        <div id="blocoDinheiro" class="blocoCondicional" style="display:none;">
+            <label class="opcaoPagamento">
+                <input type="checkbox" id="precisaTroco">
+                Preciso de troco
+            </label>
+            <input type="number" id="trocoPara" placeholder="Troco para quanto? (ex: 100)" style="display:none;">
+        </div>
+
+        <div class="resumoPedido" id="resumoPedidoFinal"></div>
+
+        <button id="btnFinalizarPedido" class="botao">Finalizar pedido</button>
+        <button id="btnFecharCheckout" class="botaoSecundario">Voltar ao carrinho</button>
+
+    </div>
+</div>
+
+<!-- MODAL CONFIRMAÇÃO -->
+<div id="modalConfirmacao" class="modal" style="display:none;">
+    <div class="modalConteudo">
+
+        <h2>✅ Pedido registrado!</h2>
+        <p class="textoAuxiliar">Toque no botão abaixo para enviar seu pedido pelo WhatsApp e confirmar com a loja.</p>
+
+        <a id="linkWhatsappPedido" href="#" target="_blank" class="botao">📲 Enviar no WhatsApp</a>
+
+        <button id="btnNovoPedido" class="botaoSecundario">Fazer novo pedido</button>
+
+    </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="telaAdminLoginCardapio" class="tela" style="display:none;">
+
+    <h1>Área do Administrador</h1>
+
+    <input type="password" id="adminSenhaCardapio" placeholder="Senha">
+
+    <button id="btnEntrarAdminCardapio" class="botao">Entrar</button>
+    <button id="btnVoltarAdminLoginCardapio" class="botaoSecundario">Voltar</button>
+
+</div>
+
+<!-- ADMIN CENTRAL -->
+<div id="centralAdminCardapio" class="tela" style="display:none;">
+
+    <h1>Admin do Cardápio</h1>
+
+    <button id="btnAdminProdutos" class="botao">🍰 Produtos</button>
+    <button id="btnAdminBairros" class="botao">🏘️ Bairros e taxas</button>
+    <button id="btnAdminPedidos" class="botao">🛍️ Pedidos</button>
+    <button id="btnAdminConfigPagamento" class="botao">💳 Pagamento e WhatsApp</button>
+
+    <button id="btnSairAdminCardapio" class="botaoSair">Sair</button>
+
+</div>
+
+<!-- ADMIN: PRODUTOS -->
+<div id="modalAdminProdutos" class="modal" style="display:none;">
+    <div class="modalConteudo modalCheckoutConteudo">
+
+        <h2>🍰 Produtos</h2>
+
+        <p class="tituloCard">Novo produto</p>
+        <input type="text" id="produtoNome" placeholder="Nome do produto">
+        <input type="text" id="produtoDescricao" placeholder="Descrição curta">
+        <input type="number" id="produtoPreco" placeholder="Preço (ex: 12.50)" step="0.01">
+        <input type="text" id="produtoCategoria" placeholder="Categoria (ex: Doces, Bolos)">
+        <input type="text" id="produtoImagemUrl" placeholder="Link da foto (opcional)">
+        <label class="opcaoPagamento">
+            <input type="checkbox" id="produtoControlarEstoque">
+            Controlar estoque
+        </label>
+        <input type="number" id="produtoEstoqueQtd" placeholder="Quantidade em estoque" style="display:none;">
+        <label class="opcaoPagamento">
+            <input type="checkbox" id="produtoDisponivel" checked>
+            Disponível no cardápio
+        </label>
+        <button id="btnSalvarProduto" class="botao">Adicionar produto</button>
+
+        <p class="tituloCard">Produtos cadastrados</p>
+        <div id="listaAdminProdutos" class="listaClientes"><p>Carregando...</p></div>
+
+        <button id="btnFecharAdminProdutos" class="botaoSecundario">Voltar</button>
+
+    </div>
+</div>
+
+<!-- ADMIN: BAIRROS -->
+<div id="modalAdminBairros" class="modal" style="display:none;">
+    <div class="modalConteudo">
+
+        <h2>🏘️ Bairros e taxas</h2>
+
+        <p class="tituloCard">Novo bairro</p>
+        <input type="text" id="bairroNome" placeholder="Nome do bairro">
+        <input type="number" id="bairroTaxa" placeholder="Taxa de entrega (ex: 8.00)" step="0.01">
+        <button id="btnSalvarBairro" class="botao">Adicionar bairro</button>
+
+        <p class="tituloCard">Bairros cadastrados</p>
+        <div id="listaAdminBairros" class="listaClientes"><p>Carregando...</p></div>
+
+        <button id="btnFecharAdminBairros" class="botaoSecundario">Voltar</button>
+
+    </div>
+</div>
+
+<!-- ADMIN: PEDIDOS -->
+<div id="modalAdminPedidos" class="modal" style="display:none;">
+    <div class="modalConteudo">
+
+        <h2>🛍️ Pedidos</h2>
+        <p class="textoAuxiliar">Cada botão de status abre o WhatsApp com a mensagem pronta pra enviar ao cliente.</p>
+
+        <div id="listaAdminPedidos" class="listaClientes"><p>Carregando...</p></div>
+
+        <button id="btnFecharAdminPedidos" class="botaoSecundario">Voltar</button>
+
+    </div>
+</div>
+
+<!-- ADMIN: CONFIG PAGAMENTO -->
+<div id="modalConfigPagamento" class="modal" style="display:none;">
+    <div class="modalConteudo">
+
+        <h2>💳 Pagamento e WhatsApp</h2>
+
+        <input type="text" id="configChavePix" placeholder="Chave Pix">
+        <input type="text" id="configNomeTitularPix" placeholder="Nome do titular da chave Pix">
+        <input type="text" id="configWhatsappLoja" placeholder="WhatsApp da loja (ex: 5511999999999)">
+        <input type="text" id="configEnderecoLoja" placeholder="Endereço da loja (aparece no topo)">
+        <input type="text" id="configLinkGoogle" placeholder="Link de avaliação do Google">
+
+        <button id="btnSalvarConfigPagamento" class="botao">Salvar</button>
+        <button id="btnFecharConfigPagamento" class="botaoSecundario">Voltar</button>
+
+    </div>
+</div>
+
+<script type="module" src="cardapio.js"></script>
+</body>
+</html>
