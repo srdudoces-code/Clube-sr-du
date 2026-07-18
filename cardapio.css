@@ -1,3 +1,8 @@
+body{
+display:block;
+padding:0;
+}
+
 .cabecalhoCardapio{
 display:flex;
 align-items:center;
