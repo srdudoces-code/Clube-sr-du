@@ -7,7 +7,6 @@ import {
     addDoc,
     getDocs,
     updateDoc,
-    deleteDoc,
     query,
     where
 } from "./firebase.js";
@@ -91,7 +90,6 @@ const codigoGerado = document.getElementById("codigoGerado");
 const btnClientes = document.getElementById("btnClientes");
 const btnFecharClientes = document.getElementById("btnFecharClientes");
 const buscaCliente = document.getElementById("buscaCliente");
-const ordenarClientes = document.getElementById("ordenarClientes");
 const listaClientes = document.getElementById("listaClientes");
 
 const btnPremios = document.getElementById("btnPremios");
@@ -763,11 +761,11 @@ btnClientes.onclick = async () => {
 
         resultado.forEach(docSnap => {
 
-            todosClientes.push({ id: docSnap.id, ...docSnap.data() });
+            todosClientes.push(docSnap.data());
 
         });
 
-        renderizarClientes(ordenarLista(todosClientes));
+        renderizarClientes(todosClientes);
 
     } catch (erro) {
 
@@ -777,42 +775,6 @@ btnClientes.onclick = async () => {
     }
 
 };
-
-function ordenarLista(lista) {
-
-    const criterio = ordenarClientes.value;
-    const copia = [...lista];
-
-    if (criterio === "selos") {
-
-        copia.sort((a, b) => (b.selosTotal || 0) - (a.selosTotal || 0));
-
-    } else if (criterio === "compra") {
-
-        copia.sort((a, b) => (b.ultimaCompraData || "").localeCompare(a.ultimaCompraData || ""));
-
-    } else {
-
-        copia.sort((a, b) => (a.nome || "").localeCompare(b.nome || "", "pt-BR"));
-
-    }
-
-    return copia;
-
-}
-
-ordenarClientes.addEventListener("change", () => {
-
-    const termo = buscaCliente.value.trim().toLowerCase();
-
-    const filtrados = todosClientes.filter(c =>
-        (c.nome || "").toLowerCase().includes(termo) ||
-        (c.telefone || "").toLowerCase().includes(termo)
-    );
-
-    renderizarClientes(ordenarLista(filtrados));
-
-});
 
 function renderizarClientes(lista) {
 
@@ -832,34 +794,9 @@ function renderizarClientes(lista) {
             "<strong>" + c.nome + "</strong>" +
             "<p>📱 " + c.telefone + "</p>" +
             "<p>🏅 " + selos + " selos" + marco + "</p>" +
-            "<button class='botaoPequenoExcluir' data-id='" + c.id + "'>Excluir</button>" +
             "</div>";
 
     }).join("");
-
-    listaClientes.querySelectorAll(".botaoPequenoExcluir").forEach(btn => {
-
-        btn.onclick = async () => {
-
-            if (!confirm("Excluir este cliente? Essa ação não pode ser desfeita.")) return;
-
-            try {
-
-                await deleteDoc(doc(db, "clientes", btn.dataset.id));
-
-                todosClientes = todosClientes.filter(c => c.id !== btn.dataset.id);
-                renderizarClientes(ordenarLista(todosClientes));
-
-            } catch (erro) {
-
-                console.error(erro);
-                alert("❌ " + erro.message);
-
-            }
-
-        };
-
-    });
 
 }
 
@@ -872,9 +809,7 @@ buscaCliente.addEventListener("input", () => {
         (c.telefone || "").toLowerCase().includes(termo)
     );
 
-    renderizarClientes(ordenarLista(filtrados));
-
-
+    renderizarClientes(filtrados);
 
 });
 
