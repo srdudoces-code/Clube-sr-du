@@ -93,6 +93,17 @@ outline:none;
 border-color:#7C8F66;
 }
 
+select{
+width:100%;
+padding:14px;
+margin-bottom:12px;
+border:1px solid #ddd;
+border-radius:12px;
+font-size:15px;
+background:#fff;
+color:#333;
+}
+
 .botao{
 width:100%;
 padding:16px;
@@ -317,4 +328,15 @@ font-size:16px;
 font-size:13px;
 color:#666;
 margin:2px 0 0 0;
+}
+
+.botaoPequenoExcluir{
+background:#b33;
+color:#fff;
+border:none;
+border-radius:8px;
+padding:6px 12px;
+font-size:12px;
+cursor:pointer;
+margin-top:6px;
 }
