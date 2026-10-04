@@ -7,6 +7,7 @@ import {
     addDoc,
     getDocs,
     updateDoc,
+    deleteDoc,
     query,
     where
 } from "./firebase.js";
@@ -90,6 +91,7 @@ const codigoGerado = document.getElementById("codigoGerado");
 const btnClientes = document.getElementById("btnClientes");
 const btnFecharClientes = document.getElementById("btnFecharClientes");
 const buscaCliente = document.getElementById("buscaCliente");
+const ordenarClientes = document.getElementById("ordenarClientes");
 const listaClientes = document.getElementById("listaClientes");
 
 const btnPremios = document.getElementById("btnPremios");
@@ -604,6 +606,94 @@ function atualizarPremioDia() {
 
 }
 
+// ==========================
+// SONS DA ROLETA (sintetizados, sem arquivo externo)
+// ==========================
+
+let audioCtx = null;
+
+function obterAudioCtx() {
+
+    if (!audioCtx) {
+
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    }
+
+    if (audioCtx.state === "suspended") {
+
+        audioCtx.resume();
+
+    }
+
+    return audioCtx;
+
+}
+
+function tocarTique(intensidade) {
+
+    try {
+
+        const ctx = obterAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "square";
+        osc.frequency.value = 520 + intensidade * 60;
+
+        gain.gain.setValueAtTime(0.14, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.07);
+
+    } catch (erro) {
+
+        console.error(erro);
+
+    }
+
+}
+
+function tocarVitoria() {
+
+    try {
+
+        const ctx = obterAudioCtx();
+        const notas = [523.25, 659.25, 783.99, 1046.5];
+
+        notas.forEach((freq, i) => {
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const inicio = ctx.currentTime + i * 0.11;
+
+            osc.type = "triangle";
+            osc.frequency.value = freq;
+
+            gain.gain.setValueAtTime(0.0001, inicio);
+            gain.gain.exponentialRampToValueAtTime(0.22, inicio + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, inicio + 0.4);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start(inicio);
+            osc.stop(inicio + 0.45);
+
+        });
+
+    } catch (erro) {
+
+        console.error(erro);
+
+    }
+
+}
+
 btnGirar.onclick = async () => {
 
     if (girando || !podeGirarHoje()) return;
@@ -612,51 +702,86 @@ btnGirar.onclick = async () => {
     btnGirar.disabled = true;
     roleta.classList.add("girando");
 
-    const opcoes = listaPremiosDiarios();
-    const emojisRoleta = ["🎁", "🍬", "🍫", "🧁", "🍪", "🥐"];
+    // Destrava o áudio no celular: precisa acontecer bem aqui, ainda dentro
+    // do toque do usuário, senão o navegador pode bloquear o som depois.
+    const ctxAudio = obterAudioCtx();
 
-    let contagem = 0;
-    const totalGiros = 14;
+    if (ctxAudio.state === "suspended") {
 
-    const intervalo = setInterval(async () => {
+        try {
 
-        roleta.textContent = emojisRoleta[contagem % emojisRoleta.length];
-        contagem++;
+            await ctxAudio.resume();
 
-        if (contagem >= totalGiros) {
+        } catch (erro) {
 
-            clearInterval(intervalo);
-            roleta.classList.remove("girando");
-
-            const premioSorteado = opcoes[Math.floor(Math.random() * opcoes.length)];
-            const agora = new Date().toISOString();
-
-            const updates = {
-
-                premioDoDia: premioSorteado,
-                premioDoDiaData: agora,
-                ultimaGiradaData: hojeStr()
-
-            };
-
-            try {
-
-                await updateDoc(doc(db, "clientes", clienteAtual.id), updates);
-                Object.assign(clienteAtual, updates);
-
-            } catch (erro) {
-
-                console.error(erro);
-                alert("❌ " + erro.message);
-
-            }
-
-            girando = false;
-            atualizarPremioDia();
+            console.error(erro);
 
         }
 
-    }, 120);
+    }
+
+    const opcoes = listaPremiosDiarios();
+    const emojisRoleta = ["🎁", "🍬", "🍫", "🧁", "🍪", "🥐"];
+
+    const totalGiros = 16;
+    let contagem = 0;
+
+    function proximoGiro() {
+
+        roleta.textContent = emojisRoleta[contagem % emojisRoleta.length];
+        tocarTique(contagem);
+        contagem++;
+
+        if (contagem < totalGiros) {
+
+            // desacelera conforme se aproxima do final, como numa roleta de cassino
+            const progresso = contagem / totalGiros;
+            const atraso = 90 + Math.pow(progresso, 3) * 260;
+
+            setTimeout(proximoGiro, atraso);
+
+        } else {
+
+            finalizarGiro();
+
+        }
+
+    }
+
+    async function finalizarGiro() {
+
+        roleta.classList.remove("girando");
+        tocarVitoria();
+
+        const premioSorteado = opcoes[Math.floor(Math.random() * opcoes.length)];
+        const agora = new Date().toISOString();
+
+        const updates = {
+
+            premioDoDia: premioSorteado,
+            premioDoDiaData: agora,
+            ultimaGiradaData: hojeStr()
+
+        };
+
+        try {
+
+            await updateDoc(doc(db, "clientes", clienteAtual.id), updates);
+            Object.assign(clienteAtual, updates);
+
+        } catch (erro) {
+
+            console.error(erro);
+            alert("❌ " + erro.message);
+
+        }
+
+        girando = false;
+        atualizarPremioDia();
+
+    }
+
+    proximoGiro();
 
 };
 
@@ -761,11 +886,11 @@ btnClientes.onclick = async () => {
 
         resultado.forEach(docSnap => {
 
-            todosClientes.push(docSnap.data());
+            todosClientes.push({ id: docSnap.id, ...docSnap.data() });
 
         });
 
-        renderizarClientes(todosClientes);
+        renderizarClientes(ordenarLista(todosClientes));
 
     } catch (erro) {
 
@@ -775,6 +900,42 @@ btnClientes.onclick = async () => {
     }
 
 };
+
+function ordenarLista(lista) {
+
+    const criterio = ordenarClientes.value;
+    const copia = [...lista];
+
+    if (criterio === "selos") {
+
+        copia.sort((a, b) => (b.selosTotal || 0) - (a.selosTotal || 0));
+
+    } else if (criterio === "compra") {
+
+        copia.sort((a, b) => (b.ultimaCompraData || "").localeCompare(a.ultimaCompraData || ""));
+
+    } else {
+
+        copia.sort((a, b) => (a.nome || "").localeCompare(b.nome || "", "pt-BR"));
+
+    }
+
+    return copia;
+
+}
+
+ordenarClientes.addEventListener("change", () => {
+
+    const termo = buscaCliente.value.trim().toLowerCase();
+
+    const filtrados = todosClientes.filter(c =>
+        (c.nome || "").toLowerCase().includes(termo) ||
+        (c.telefone || "").toLowerCase().includes(termo)
+    );
+
+    renderizarClientes(ordenarLista(filtrados));
+
+});
 
 function renderizarClientes(lista) {
 
@@ -794,9 +955,34 @@ function renderizarClientes(lista) {
             "<strong>" + c.nome + "</strong>" +
             "<p>📱 " + c.telefone + "</p>" +
             "<p>🏅 " + selos + " selos" + marco + "</p>" +
+            "<button class='botaoPequenoExcluir' data-id='" + c.id + "'>Excluir</button>" +
             "</div>";
 
     }).join("");
+
+    listaClientes.querySelectorAll(".botaoPequenoExcluir").forEach(btn => {
+
+        btn.onclick = async () => {
+
+            if (!confirm("Excluir este cliente? Essa ação não pode ser desfeita.")) return;
+
+            try {
+
+                await deleteDoc(doc(db, "clientes", btn.dataset.id));
+
+                todosClientes = todosClientes.filter(c => c.id !== btn.dataset.id);
+                renderizarClientes(ordenarLista(todosClientes));
+
+            } catch (erro) {
+
+                console.error(erro);
+                alert("❌ " + erro.message);
+
+            }
+
+        };
+
+    });
 
 }
 
@@ -809,7 +995,9 @@ buscaCliente.addEventListener("input", () => {
         (c.telefone || "").toLowerCase().includes(termo)
     );
 
-    renderizarClientes(filtrados);
+    renderizarClientes(ordenarLista(filtrados));
+
+
 
 });
 
